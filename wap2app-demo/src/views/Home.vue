@@ -10,6 +10,7 @@
     <button @click="handleCreateBarcode">打开扫码</button><br /><br />
     <button @click="handleChooseImgToScan">相册扫码</button><br /><br />
     <button @click="handleWxPay">微信支付</button><br /><br />
+    <button @click="handleOpenApp">打开第三方应用</button><br /><br />
   </div>
 </template>
 
@@ -166,6 +167,9 @@ export default {
           }
         }
       });
+    },
+    handleOpenApp() {
+      window.mplus.openTaobao();
     }
   }
 };

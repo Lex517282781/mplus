@@ -47,6 +47,9 @@
   var closeBarcode = initfn // 关闭扫码
   var chooseImgToScan = initfn // 选择图片扫码
   var wxPay = initfn // 选择图片扫码
+  var openTaobao = function () {
+    window.location.href = 'taobao://s.taobao.com/search?q=uni-app'
+  } // 打开淘宝
 
   function _html5PlusEnv (callback) {
     if (!navigator.userAgent.match(/Html5Plus/i)) {
@@ -455,6 +458,8 @@
     createBarcode: createBarcode, // 打开扫码
     closeBarcode: closeBarcode, // 关闭扫码
     chooseImgToScan: chooseImgToScan, // 选择图片扫码
-    wxPay: wxPay // 微信支付
+    wxPay: wxPay, // 微信支付
+
+    openTaobao: openTaobao // 打开淘宝
   }
 })()
