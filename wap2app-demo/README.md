@@ -1,29 +1,7 @@
-# wap2app-demo
+## 查看 app 的 scheme
 
-## Project setup
-```
-npm install
-```
+地址[https://sharecuts.cn/]
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+在搜索栏搜索自己需要查看的应用
 
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Run your tests
-```
-npm run test
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+应用包名查看[https://www.jianshu.com/p/cfb7f212a5a2]

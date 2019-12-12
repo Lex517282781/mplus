@@ -1,4 +1,4 @@
-;[
+[
   // 只在 ios 中生效
   {
     name: 'App Store',
@@ -38,5 +38,10 @@
     name: '优酷',
     pname: 'com.youku.phone',
     scheme: 'youku://'
+  },
+  {
+    name: '拼多多',
+    pname: 'com.xunmeng.pinduoduo',
+    scheme: 'pinduoduo://'
   }
-]
+];
