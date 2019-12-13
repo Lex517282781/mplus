@@ -203,8 +203,10 @@ export default {
     handleSaveImg() {
       window.mplus.saveImg({
         plus: {
-          filePath:
-            "https://s11.mogucdn.com/mlcdn/711693/191213_4le3dig2b248a2l5gkc162j5gkja3_430x430.jpg",
+          pictures: [
+            "https://htkimg.xiaoxixi8.com/s97042822404dd1620632ab642fa81a22e3201fdd3c1.jpg",
+            "https://htkimg.xiaoxixi8.com/s97027560299cb53fda6e00e48958c9f94a932ad5c7e.jpg"
+          ],
           progress: function(downloadedSize, totalSize, percent, completed) {
             console.log(downloadedSize, totalSize, percent, completed);
           },

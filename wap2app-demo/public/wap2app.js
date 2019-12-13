@@ -722,50 +722,60 @@
 
     saveImg = function (config) {
       config = config || {}
+      var pictures = config.plus.pictures
       var filePath = config.plus.filePath
       var progress = config.plus.progress
       var success = config.plus.success
       var error = config.plus.error
-      if (!filePath) {
+      if (!filePath && (!pictures || !pictures.length)) {
         _alert('请传入要下载的图片路径')
         return false
       }
 
-      if (filePath.indexOf('data:image/') === 0) {
-        _loadBase64(
-          filePath,
-          function (localFilePath) {
-            window.plus.gallery.save(
-              localFilePath,
-              function (e) {
-                success && success(e.file)
-              },
-              function (e) {
-                error && error(e.file)
-              }
-            )
-          },
-          error
-        )
-      } else {
-        createDownload(
-          filePath,
-          progress,
-          function (path) {
-            window.plus.gallery.save(
-              path,
-              function (e) {
-                success && success(e.file)
-              },
-              function (e) {
-                error && error(e.file)
-              }
-            )
-          },
-          function (err) {
-            error && error(err)
-          }
-        )
+      if (filePath) _save(filePath)
+      if(pictures && pictures.length) {
+        for(var i = 0, l = pictures.length; i < l; i ++ ) {
+          _save(pictures[i])
+        }
+      }
+
+      function _save (filePath) {
+        if (filePath.indexOf('data:image/') === 0) {
+          _loadBase64(
+            filePath,
+            function (localFilePath) {
+              window.plus.gallery.save(
+                localFilePath,
+                function (e) {
+                  success && success(e.file)
+                },
+                function (e) {
+                  error && error(e.file)
+                }
+              )
+            },
+            error
+          )
+        } else {
+          createDownload(
+            filePath,
+            progress,
+            function (path) {
+              window.plus.gallery.save(
+                path,
+                function (e) {
+                  success && success(e.file)
+                },
+                function (e) {
+                  error && error(e.file)
+                }
+              )
+            },
+            function (err) {
+              error && error(err)
+            }
+          )
+        }
       }
     }
   }) // --- _html5PlusEnv e ---
