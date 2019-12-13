@@ -11,7 +11,9 @@
     <button @click="handleChooseImgToScan">相册扫码</button><br /><br />
     <button @click="handleWxPay">微信支付</button><br /><br />
     <button @click="handleOpenApp">打开第三方应用</button><br /><br />
+    <button @click="handleOpenMmj">打开蘑菇街</button><br /><br />
     <button @click="handleOpenMap">打开地图</button><br /><br />
+    <button @click="handleSaveImg">保存图片</button><br /><br />
   </div>
 </template>
 
@@ -180,12 +182,38 @@ export default {
         }
       });
     },
+    handleOpenMmj() {
+      window.mplus.openMmj({
+        plus: {
+          pictures: [
+            "https://s11.mogucdn.com/mlcdn/711693/191213_4le3dig2b248a2l5gkc162j5gkja3_430x430.jpg"
+          ]
+        }
+      });
+    },
     handleOpenMap() {
       window.mplus.openMap({
         query: {
-          address: '浙江省杭州市下城区武林路376号',
+          address: "浙江省杭州市下城区武林路376号",
           lat: "30.27541648767812",
           lon: "120.16598489722605"
+        }
+      });
+    },
+    handleSaveImg() {
+      window.mplus.saveImg({
+        plus: {
+          filePath:
+            "https://s11.mogucdn.com/mlcdn/711693/191213_4le3dig2b248a2l5gkc162j5gkja3_430x430.jpg",
+          progress: function(downloadedSize, totalSize, percent, completed) {
+            console.log(downloadedSize, totalSize, percent, completed);
+          },
+          success: function(res) {
+            console.log(res);
+          },
+          error: function(err) {
+            console.log(err);
+          }
         }
       });
     }

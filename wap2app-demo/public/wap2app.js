@@ -26,6 +26,12 @@
     success && success()
   }
 
+  function initOpenFn (config, initUrl) {
+    config = config || {}
+    var url = url || initUrl
+    window.location.href = url
+  }
+
   var shareServices = {} // 分享服务
   var oauthServices = {} // 签权服务
   var payServices = {} // 支付服务
@@ -48,15 +54,14 @@
   var chooseImgToScan = initfn // 选择图片扫码
   var wxPay = initfn // 选择图片扫码
   var openTaobao = function (config) {
-    config = config || {}
-    var url = url || 'https://h5.m.taobao.com'
-    window.location.href = url
+    initOpenFn(config, 'https://h5.m.taobao.com')
   } // 打开淘宝
   var openPingduoduo = function (config) {
-    config = config || {}
-    var url = url || 'https://m.pinduoduo.com'
-    window.location.href = url
+    initOpenFn(config, 'https://m.pinduoduo.com')
   } // 打开拼多多
+  var openMmj = function () {
+    initOpenFn(config, 'https://m.mogu.com/')
+  } // 打开蘑菇街
 
   var openMap = function (config) {
     config = config || {}
@@ -76,6 +81,8 @@
         '&coord_type=gcj02&output=html&src=andr.huima.lilimiao'
     }
   }
+
+  var saveImg = function (config) {} // 保存图片
 
   function _toQueryPair (key, value) {
     if (typeof value === 'undefined') {
@@ -129,6 +136,20 @@
         window.plus.nativeUI.alert(msg)
       } else {
         console.log(msg)
+      }
+    }
+
+    function _showLoading () {
+      if (mplusConfig.hint) {
+        window.plus.nativeUI.showWaiting('请稍后...')
+      } else {
+      }
+    }
+
+    function _closeLoading () {
+      if (mplusConfig.hint) {
+        window.plus.nativeUI.closeWaiting()
+      } else {
       }
     }
 
@@ -575,6 +596,18 @@
       }
     }
 
+    openMmj = function (config) {
+      config = config || {}
+      var pictures = config.plus.pictures
+      WXSceneSessionShare({
+        plus: {
+          msg: {
+            pictures
+          }
+        }
+      })
+    }
+
     openMap = function (config) {
       var baiduMap = {
         pname: 'com.baidu.BaiduMap',
@@ -635,11 +668,111 @@
         window.plus.runtime.openURL('geo:')
       }
     }
+
+    function _loadBase64 (base64, success, error) {
+      var b = new plus.nativeObj.Bitmap()
+      b.loadBase64Data(base64)
+      var fileType = dataUrl.indexOf('png') > -1 ? '.png' : '.jpeg'
+      var fileName = new Date().getTime() + fileType
+      b.save(
+        '_www/' + fileName,
+        { overwrite: true },
+        function () {
+          success && success('_www/' + fileName)
+        },
+        function (err) {
+          error && error(err)
+        }
+      )
+    }
+
+    function createDownload (filePath, progress, success, error) {
+      if (!filePath) {
+        _alert('请输入下载文件的链接')
+        return false
+      }
+      _showLoading()
+      var dtask = window.plus.downloader.createDownload(filePath, {}, function (d, status) {
+        // 下载完成
+        if (status == 200) {
+          txtFilePath = d.filename
+          _closeLoading()
+          _toast('保存成功')
+          success && success(txtFilePath)
+        } else {
+          _toast('失败成功')
+          error && error(d)
+        }
+      })
+      dtask.addEventListener(
+        'statechanged',
+        function (download) {
+          if (download.state == 3) {
+            var percent = parseFloat((download.downloadedSize / download.totalSize) * 100).toFixed(2)
+            if (typeof progress === 'function') {
+              progress(dtask.downloadedSize, dtask.totalSize, percent + '%', percent === 100)
+            }
+          }
+        },
+        false
+      )
+      dtask.start()
+      return dtask
+    }
+
+    saveImg = function (config) {
+      config = config || {}
+      var filePath = config.plus.filePath
+      var progress = config.plus.progress
+      var success = config.plus.success
+      var error = config.plus.error
+      if (!filePath) {
+        _alert('请传入要下载的图片路径')
+        return false
+      }
+
+      if (filePath.indexOf('data:image/') === 0) {
+        _loadBase64(
+          filePath,
+          function (localFilePath) {
+            window.plus.gallery.save(
+              localFilePath,
+              function (e) {
+                success && success(e.file)
+              },
+              function (e) {
+                error && error(e.file)
+              }
+            )
+          },
+          error
+        )
+      } else {
+        createDownload(
+          filePath,
+          progress,
+          function (path) {
+            window.plus.gallery.save(
+              path,
+              function (e) {
+                success && success(e.file)
+              },
+              function (e) {
+                error && error(e.file)
+              }
+            )
+          },
+          function (err) {
+            error && error(err)
+          }
+        )
+      }
+    }
   }) // --- _html5PlusEnv e ---
 
   window.mplus = {
     setConfig: setConfig, // 全局配置
-    WXSceneSessionShare: WXSceneSessionShare, // 微信好友分享
+    WXSceneSessionShare: WXSceneSessionShare, // 微信好友分享 详见参数 https://www.html5plus.org/doc/zh_cn/share.html#plus.share.ShareMessage
     WXSceneTimelineShare: WXSceneTimelineShare, // 微信朋友圈分享
     MiniProgramShare: MiniProgramShare, // 微信小程序分享
     wxLogin: wxLogin, // 微信登录
@@ -652,7 +785,9 @@
 
     openTaobao: openTaobao, // 打开淘宝
     openPingduoduo: openPingduoduo, // 打开拼多多
+    openMmj: openMmj, // 打开拼多多
 
-    openMap: openMap // 打开地图
+    openMap: openMap, // 打开地图
+    saveImg: saveImg // 保存图片
   }
 })()
