@@ -1,4 +1,4 @@
-[
+;[
   // 只在 ios 中生效
   {
     name: 'App Store',
@@ -44,4 +44,4 @@
     pname: 'com.xunmeng.pinduoduo',
     scheme: 'pinduoduo://'
   }
-];
+]

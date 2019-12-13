@@ -17,11 +17,11 @@
 		"easyConfig": {}
 	},
 	"pages": [{
-		"webviewId": "__W2A__192.168.31.158", //首页
+		"webviewId": "__W2A__192.168.2.228", //首页
 		"matchUrls": [{
-			"href": "http://192.168.31.158:8081"
+			"href": "http://192.168.2.228:8081"
 		}, {
-			"href": "http://192.168.31.158:8081/"
+			"href": "http://192.168.2.228:8081/"
 		}],
 		"webviewParameter": {
 			"titleNView": false,

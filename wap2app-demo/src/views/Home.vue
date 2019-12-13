@@ -11,12 +11,13 @@
     <button @click="handleChooseImgToScan">相册扫码</button><br /><br />
     <button @click="handleWxPay">微信支付</button><br /><br />
     <button @click="handleOpenApp">打开第三方应用</button><br /><br />
+    <button @click="handleOpenMap">打开地图</button><br /><br />
   </div>
 </template>
 
 <script>
 export default {
-  name: 'home',
+  name: "home",
   mounted() {},
   methods: {
     handleWXSceneSessionShare() {
@@ -24,157 +25,170 @@ export default {
         plus: {
           msg: {
             title: document.title, // 标题
-            content: '微信分享', // 分享内容或者应用描述
+            content: "微信分享", // 分享内容或者应用描述
             href: location.href, // 分享出去后，点击跳转的地址
             thumbs: [
-              'http://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83eo5hd9ovRGbib6TYibI1TpRNEqWjW3VmZ5Kv0FCOwAXibXeqiauFF80Jcg53oYr3bUzwyYrYjZ7Ogu8ibQ/132'
+              "http://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83eo5hd9ovRGbib6TYibI1TpRNEqWjW3VmZ5Kv0FCOwAXibXeqiauFF80Jcg53oYr3bUzwyYrYjZ7Ogu8ibQ/132"
             ] // 分享缩略图
           },
           success: () => {
-            console.log('分享成功')
+            console.log("分享成功");
           },
           error: () => {
-            console.log('分享失败')
+            console.log("分享失败");
           }
         },
         h5: {
           success: () => {
-            console.log('h5 handleWXSceneSessionShare')
+            console.log("h5 handleWXSceneSessionShare");
           }
         }
-      })
+      });
     },
     handleWXSceneTimelineShare() {
       window.mplus.WXSceneTimelineShare({
         plus: {
           msg: {
             title: document.title, // 标题
-            content: '朋友圈分享', // 分享内容或者应用描述
+            content: "朋友圈分享", // 分享内容或者应用描述
             href: location.href, // 分享出去后，点击跳转的地址
             thumbs: [
-              'http://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83eo5hd9ovRGbib6TYibI1TpRNEqWjW3VmZ5Kv0FCOwAXibXeqiauFF80Jcg53oYr3bUzwyYrYjZ7Ogu8ibQ/132'
+              "http://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83eo5hd9ovRGbib6TYibI1TpRNEqWjW3VmZ5Kv0FCOwAXibXeqiauFF80Jcg53oYr3bUzwyYrYjZ7Ogu8ibQ/132"
             ] // 分享缩略图
           },
           success: () => {
-            console.log('分享成功')
+            console.log("分享成功");
           },
           error: () => {
-            console.log('分享失败')
+            console.log("分享失败");
           }
         },
         h5: {
           success: () => {
-            console.log('h5 handleWXSceneTimelineShare')
+            console.log("h5 handleWXSceneTimelineShare");
           }
         }
-      })
+      });
     },
     handleMiniProgramShare() {
       window.mplus.MiniProgramShare({
         plus: {
           msg: {
-            type: 'miniProgram',
+            type: "miniProgram",
             title: document.title, // 标题
-            content: '朋友圈分享', // 分享内容或者应用描述
+            content: "朋友圈分享", // 分享内容或者应用描述
             href: location.href, // 分享出去后，点击跳转的地址
             thumbs: [
-              'http://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83eo5hd9ovRGbib6TYibI1TpRNEqWjW3VmZ5Kv0FCOwAXibXeqiauFF80Jcg53oYr3bUzwyYrYjZ7Ogu8ibQ/132'
+              "http://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83eo5hd9ovRGbib6TYibI1TpRNEqWjW3VmZ5Kv0FCOwAXibXeqiauFF80Jcg53oYr3bUzwyYrYjZ7Ogu8ibQ/132"
             ], // 分享缩略图
             miniProgram: {
-              id: 'gh_33446d7f7a26', // gh_33446d7f7a26
-              path: '/pages/component/component', // /pages/component/component
-              webUrl: 'http://uniapp.dcloud.io',
+              id: "gh_33446d7f7a26", // gh_33446d7f7a26
+              path: "/pages/component/component", // /pages/component/component
+              webUrl: "http://uniapp.dcloud.io",
               type: 0
             }
           },
           success: () => {
-            console.log('分享成功')
+            console.log("分享成功");
           },
           error: () => {
-            console.log('分享失败')
+            console.log("分享失败");
           }
         },
         h5: {
           success: () => {
-            console.log('h5 handleMiniProgramShare')
+            console.log("h5 handleMiniProgramShare");
           }
         }
-      })
+      });
     },
     handleWxLogin() {
       window.mplus.wxLogin({
         plus: {
           success: userInfo => {
-            console.log(userInfo, 'handleWxLogin')
+            console.log(userInfo, "handleWxLogin");
           }
         },
         h5: {
           success: () => {}
         }
-      })
+      });
     },
     handleWxLogout() {
       window.mplus.wxLogout({
         plus: {
           success: () => {
-            console.log('注销')
+            console.log("注销");
           }
         },
         h5: {
           success: () => {}
         }
-      })
+      });
     },
     handlePosition() {
       window.mplus.getCurrentPosition({
         plus: {
           success: function(res) {
-            console.log(res)
+            console.log(res);
           },
           error: function() {}
         },
         h5: {
           success: function(res) {
-            console.log(res)
+            console.log(res);
           },
           error: function() {}
         }
-      })
+      });
     },
     handleCreateBarcode() {
       window.mplus.createBarcode({
         plus: {
           success: res => {
-            console.log(res)
+            console.log(res);
           }
         }
-      })
+      });
     },
     handlCloseBarcode() {
-      window.mplus.closeBarcode()
+      window.mplus.closeBarcode();
     },
     handleChooseImgToScan() {
       window.mplus.chooseImgToScan({
         plus: {}
-      })
+      });
     },
     handleWxPay() {
       window.mplus.wxPay({
         plus: {
           data: {},
           success: res => {
-            console.log(res)
+            console.log(res);
           }
         }
-      })
+      });
     },
     handleOpenApp() {
-      window.mplus.openPingduoduo({
+      window.mplus.openTaobao({
         plus: {
-          url: ''
+          appUrl: "",
+          h5Url: ""
+        },
+        h5: {
+          url: ""
         }
-      })
+      });
+    },
+    handleOpenMap() {
+      window.mplus.openMap({
+        query: {
+          address: '浙江省杭州市下城区武林路376号',
+          lat: "30.27541648767812",
+          lon: "120.16598489722605"
+        }
+      });
     }
   }
-}
+};
 </script>
