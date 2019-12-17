@@ -71,7 +71,9 @@
     var lon = query.lon
     if (address) {
       window.location.href =
-        'http://api.map.baidu.com/geocoder?address=' + address + '&output=html&src=andr.huima.lilimiao'
+        'http://api.map.baidu.com/geocoder?address=' +
+        address +
+        '&output=html&src=andr.huima.lilimiao'
     } else {
       window.location.href =
         'http://api.map.baidu.com/geocoder?location=' +
@@ -164,6 +166,8 @@
       }
     }
 
+    var _r = _plusReady
+
     // 获取服务
     var initServices = function () {
       // 获取分享服务
@@ -251,7 +255,11 @@
 
     // 分享
     function openShare (type, msg, success, error) {
-      if (shareServices.weixin && isWechatInstalled() && !/360\sAphone/.test(navigator.userAgent)) {
+      if (
+        shareServices.weixin &&
+        isWechatInstalled() &&
+        !/360\sAphone/.test(navigator.userAgent)
+      ) {
         switch (type) {
           case 'WXSceneSession': // 分享到微信好友
             msg.extra = {
@@ -390,7 +398,7 @@
     }
 
     // 执行plusReady
-    _plusReady(initServices)
+    _r(initServices)
 
     // 微信好友分享
     WXSceneSessionShare = function (config) {
@@ -398,7 +406,9 @@
       var msg = config.plus.msg
       var success = config.plus.success
       var error = config.plus.error
-      openShare('WXSceneSession', msg, success, error)
+      _r(function () {
+        openShare('WXSceneSession', msg, success, error)
+      })
     }
 
     // 微信朋友圈分享
@@ -407,7 +417,9 @@
       var msg = config.plus.msg
       var success = config.plus.success
       var error = config.plus.error
-      openShare('WXSceneTimeline', msg, success, error)
+      _r(function () {
+        openShare('WXSceneTimeline', msg, success, error)
+      })
     }
 
     // 微信小程序分享
@@ -416,7 +428,9 @@
       var msg = config.plus.msg
       var success = config.plus.success
       var error = config.plus.error
-      openShare('miniProgram', msg, success, error)
+      _r(function () {
+        openShare('miniProgram', msg, success, error)
+      })
     }
 
     // 微信登录
@@ -424,7 +438,9 @@
       config = config || {}
       var success = config.plus.success
       var error = config.plus.error
-      _authLogin('weixin', success, error)
+      _r(function () {
+        _authLogin('weixin', success, error)
+      })
     }
 
     // 微信退出登录
@@ -432,7 +448,9 @@
       config = config || {}
       var success = config.plus.success
       var error = config.plus.error
-      authLogout('weixin', success, error)
+      _r(function () {
+        authLogout('weixin', success, error)
+      })
     }
 
     // 定位
@@ -441,7 +459,9 @@
       var success = config.plus.success
       var error = config.plus.error
       var options = config.plus.options
-      window.plus.geolocation.getCurrentPosition(success, error, options)
+      _r(function (plus) {
+        plus.geolocation.getCurrentPosition(success, error, options)
+      })
     }
 
     var _barcode = null
@@ -474,19 +494,21 @@
       for (var key in style) {
         defaultStyle[key] = style[key]
       }
-      if (!_barcode) {
-        _barcode = window.plus.barcode.create('barcode', [], defaultStyle)
-        _barcode.onmarked = function (text, result) {
-          success && success(result)
-          closeBarcode()
+      _r(function (plus) {
+        if (!_barcode) {
+          _barcode = plus.barcode.create('barcode', [], defaultStyle)
+          _barcode.onmarked = function (text, result) {
+            success && success(result)
+            closeBarcode()
+          }
+          _barcode.onerror = function (err) {
+            error && error(err)
+            closeBarcode()
+          }
+          plus.webview.currentWebview().append(_barcode)
         }
-        _barcode.onerror = function (err) {
-          error && error(err)
-          closeBarcode()
-        }
-        window.plus.webview.currentWebview().append(_barcode)
-      }
-      _barcode.start()
+        _barcode.start()
+      })
     }
 
     // 相册扫码
@@ -494,23 +516,25 @@
       config = config || {}
       var success = config.plus.success
       var error = config.plus.error
-      window.plus.gallery.pick(
-        function (path) {
-          window.plus.barcode.scan(
-            path,
-            function (type, result) {
-              success && success(result)
-            },
-            function (e) {
-              error && error(e)
-            }
-          )
-        },
-        function (e) {
-          error && error(e)
-        },
-        { filter: 'image', system: false }
-      )
+      _r(function (plus) {
+        plus.gallery.pick(
+          function (path) {
+            plus.barcode.scan(
+              path,
+              function (type, result) {
+                success && success(result)
+              },
+              function (e) {
+                error && error(e)
+              }
+            )
+          },
+          function (e) {
+            error && error(e)
+          },
+          { filter: 'image', system: false }
+        )
+      })
     }
 
     // 微信支付
@@ -519,7 +543,9 @@
       var success = config.plus.success
       var error = config.plus.error
       var data = config.plus.data
-      _requestPayment('wxpay', data, success, error)
+      _r(function () {
+        _requestPayment('wxpay', data, success, error)
+      })
     }
 
     function _checkApp (appinfo) {
@@ -544,31 +570,33 @@
       config = config || {}
       var appUrl = config.plus.appUrl || 'taobao://shop.m.taobao.com'
       var h5Url = config.plus.h5Url || 'https://h5.m.taobao.com'
-      if (_checkApp(info)) {
-        if (_isAndroid()) {
-          window.plus.runtime.launchApplication(
-            {
-              pname: 'com.taobao.taobao',
-              extra: { url: appUrl }
-            },
-            function (e) {
-              _alert('Open system default browser failed: ' + e.message)
-            }
-          )
-        } else if (_isIos()) {
-          window.plus.runtime.launchApplication(
-            {
-              action: 'com.taobao.taobao',
-              extra: { url: appUrl }
-            },
-            function (e) {
-              _alert('Open system default browser failed: ' + e.message)
-            }
-          )
+      _r(function (plus) {
+        if (_checkApp(info)) {
+          if (_isAndroid()) {
+            plus.runtime.launchApplication(
+              {
+                pname: 'com.taobao.taobao',
+                extra: { url: appUrl }
+              },
+              function (e) {
+                _alert('Open system default browser failed: ' + e.message)
+              }
+            )
+          } else if (_isIos()) {
+            plus.runtime.launchApplication(
+              {
+                action: 'com.taobao.taobao',
+                extra: { url: appUrl }
+              },
+              function (e) {
+                _alert('Open system default browser failed: ' + e.message)
+              }
+            )
+          }
+        } else {
+          plus.runtime.openURL(h5Url)
         }
-      } else {
-        window.plus.runtime.openURL(h5Url)
-      }
+      })
     }
 
     openPingduoduo = function (config) {
@@ -580,31 +608,38 @@
       config = config || {}
       var appUrl = config.plus.appUrl || 'pinduoduo://com.xunmeng.pinduoduo/'
       var h5Url = config.plus.h5Url || 'https://m.pinduoduo.com'
-      appUrl = appUrl.replace('https://mobile.yangkeduo.com/', 'pinduoduo://com.xunmeng.pinduoduo/')
-      if (_checkApp(info)) {
-        if (_isAndroid()) {
-          window.plus.runtime.openURL(appUrl, function (e) {
-            _alert('Open system default browser failed: ' + e.message)
-          })
-        } else if (_isIos()) {
-          window.plus.runtime.openURL(appUrl, function (e) {
-            _alert('Open system default browser failed: ' + e.message)
-          })
+      appUrl = appUrl.replace(
+        'https://mobile.yangkeduo.com/',
+        'pinduoduo://com.xunmeng.pinduoduo/'
+      )
+      _r(function (plus) {
+        if (_checkApp(info)) {
+          if (_isAndroid()) {
+            plus.runtime.openURL(appUrl, function (e) {
+              _alert('Open system default browser failed: ' + e.message)
+            })
+          } else if (_isIos()) {
+            plus.runtime.openURL(appUrl, function (e) {
+              _alert('Open system default browser failed: ' + e.message)
+            })
+          }
+        } else {
+          plus.runtime.openURL(h5Url)
         }
-      } else {
-        window.plus.runtime.openURL(h5Url)
-      }
+      })
     }
 
     openMmj = function (config) {
       config = config || {}
       var pictures = config.plus.pictures
-      WXSceneSessionShare({
-        plus: {
-          msg: {
-            pictures
+      _r(function () {
+        WXSceneSessionShare({
+          plus: {
+            msg: {
+              pictures
+            }
           }
-        }
+        })
       })
     }
 
@@ -639,34 +674,45 @@
           '&dev=1'
       } else {
         baiduQurl += '&location=' + (lat + ',' + lon)
-        amapUrl += 'viewReGeo?sourceApplication=andr.huima.lilimiao&lat=' + lat + '&lon=' + lon + '&dev=1'
+        amapUrl +=
+          'viewReGeo?sourceApplication=andr.huima.lilimiao&lat=' +
+          lat +
+          '&lon=' +
+          lon +
+          '&dev=1'
       }
 
-      if (_checkApp(baiduMap) && _checkApp(amap)) {
-        // 既有百度 又有高德
-        window.plus.nativeUI.actionSheet(
-          { title: '选择地图应用', cancel: '取消', buttons: [{ title: '百度地图' }, { title: '高德地图' }] },
-          function (e) {
-            switch (e.index) {
-              case 1:
-                window.plus.runtime.openURL(baiduQurl)
-                break
-              case 2:
-                window.plus.runtime.openURL(amapUrl)
-                break
+      _r(function (plus) {
+        if (_checkApp(baiduMap) && _checkApp(amap)) {
+          // 既有百度 又有高德
+          window.plus.nativeUI.actionSheet(
+            {
+              title: '选择地图应用',
+              cancel: '取消',
+              buttons: [{ title: '百度地图' }, { title: '高德地图' }]
+            },
+            function (e) {
+              switch (e.index) {
+                case 1:
+                  window.plus.runtime.openURL(baiduQurl)
+                  break
+                case 2:
+                  window.plus.runtime.openURL(amapUrl)
+                  break
+              }
             }
-          }
-        )
-      } else if (_checkApp(baiduMap)) {
-        // 只有百度
-        window.plus.runtime.openURL(baiduQurl)
-      } else if (_checkApp(amap)) {
-        // 只有高德
-        window.plus.runtime.openURL(amapUrl)
-      } else {
-        // 都没有
-        window.plus.runtime.openURL('geo:')
-      }
+          )
+        } else if (_checkApp(baiduMap)) {
+          // 只有百度
+          window.plus.runtime.openURL(baiduQurl)
+        } else if (_checkApp(amap)) {
+          // 只有高德
+          window.plus.runtime.openURL(amapUrl)
+        } else {
+          // 都没有
+          window.plus.runtime.openURL('geo:')
+        }
+      })
     }
 
     function _loadBase64 (base64, success, error) {
@@ -687,37 +733,49 @@
     }
 
     function createDownload (filePath, progress, success, error) {
-      if (!filePath) {
-        _alert('请输入下载文件的链接')
-        return false
-      }
-      _showLoading()
-      var dtask = window.plus.downloader.createDownload(filePath, {}, function (d, status) {
-        // 下载完成
-        if (status == 200) {
-          txtFilePath = d.filename
-          _closeLoading()
-          _toast('保存成功')
-          success && success(txtFilePath)
-        } else {
-          _toast('失败成功')
-          error && error(d)
+      _r(function () {
+        if (!filePath) {
+          _alert('请输入下载文件的链接')
+          return false
         }
-      })
-      dtask.addEventListener(
-        'statechanged',
-        function (download) {
-          if (download.state == 3) {
-            var percent = parseFloat((download.downloadedSize / download.totalSize) * 100).toFixed(2)
-            if (typeof progress === 'function') {
-              progress(dtask.downloadedSize, dtask.totalSize, percent + '%', percent === 100)
+        _showLoading()
+        var dtask = window.plus.downloader.createDownload(
+          filePath,
+          {},
+          function (d, status) {
+            // 下载完成
+            if (status == 200) {
+              txtFilePath = d.filename
+              _closeLoading()
+              _toast('保存成功')
+              success && success(txtFilePath)
+            } else {
+              _toast('失败成功')
+              error && error(d)
             }
           }
-        },
-        false
-      )
-      dtask.start()
-      return dtask
+        )
+        dtask.addEventListener(
+          'statechanged',
+          function (download) {
+            if (download.state == 3) {
+              var percent = parseFloat(
+                (download.downloadedSize / download.totalSize) * 100
+              ).toFixed(2)
+              if (typeof progress === 'function') {
+                progress(
+                  dtask.downloadedSize,
+                  dtask.totalSize,
+                  percent + '%',
+                  percent === 100
+                )
+              }
+            }
+          },
+          false
+        )
+        dtask.start()
+      })
     }
 
     saveImg = function (config) {
@@ -727,56 +785,58 @@
       var progress = config.plus.progress
       var success = config.plus.success
       var error = config.plus.error
-      if (!filePath && (!pictures || !pictures.length)) {
-        _alert('请传入要下载的图片路径')
-        return false
-      }
-
-      if (filePath) _save(filePath)
-      if(pictures && pictures.length) {
-        for(var i = 0, l = pictures.length; i < l; i ++ ) {
-          _save(pictures[i])
+      _r(function (plus) {
+        if (!filePath && (!pictures || !pictures.length)) {
+          _alert('请传入要下载的图片路径')
+          return false
         }
-      }
 
-      function _save (filePath) {
-        if (filePath.indexOf('data:image/') === 0) {
-          _loadBase64(
-            filePath,
-            function (localFilePath) {
-              window.plus.gallery.save(
-                localFilePath,
-                function (e) {
-                  success && success(e.file)
-                },
-                function (e) {
-                  error && error(e.file)
-                }
-              )
-            },
-            error
-          )
-        } else {
-          createDownload(
-            filePath,
-            progress,
-            function (path) {
-              window.plus.gallery.save(
-                path,
-                function (e) {
-                  success && success(e.file)
-                },
-                function (e) {
-                  error && error(e.file)
-                }
-              )
-            },
-            function (err) {
-              error && error(err)
-            }
-          )
+        if (filePath) _save(filePath)
+        if (pictures && pictures.length) {
+          for (var i = 0, l = pictures.length; i < l; i++) {
+            _save(pictures[i])
+          }
         }
-      }
+
+        function _save (filePath) {
+          if (filePath.indexOf('data:image/') === 0) {
+            _loadBase64(
+              filePath,
+              function (localFilePath) {
+                plus.gallery.save(
+                  localFilePath,
+                  function (e) {
+                    success && success(e.file)
+                  },
+                  function (e) {
+                    error && error(e.file)
+                  }
+                )
+              },
+              error
+            )
+          } else {
+            createDownload(
+              filePath,
+              progress,
+              function (path) {
+                plus.gallery.save(
+                  path,
+                  function (e) {
+                    success && success(e.file)
+                  },
+                  function (e) {
+                    error && error(e.file)
+                  }
+                )
+              },
+              function (err) {
+                error && error(err)
+              }
+            )
+          }
+        }
+      })
     }
   }) // --- _html5PlusEnv e ---
 
