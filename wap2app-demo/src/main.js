@@ -9,12 +9,16 @@ Vue.config.productionTip = false
 
 const vConsole = new Vconsole()
 
+console.log(111)
+
 window.mplus.getCurrentPosition({
   plus: {
     success: function (res) {
       console.log(res, 123)
     },
-    error: function () {}
+    error: function (e) {
+      console.log(e, 123)
+    }
   },
   h5: {
     success: function (res) {
