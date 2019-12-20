@@ -14,6 +14,7 @@
     <button @click="handleOpenMmj">打开蘑菇街</button><br /><br />
     <button @click="handleOpenMap">打开地图</button><br /><br />
     <button @click="handleSaveImg">保存图片</button><br /><br />
+    <button @click="handleUpload">上传文件</button><br /><br />
   </div>
 </template>
 
@@ -215,6 +216,27 @@ export default {
           },
           error: function(err) {
             console.log(err);
+          }
+        }
+      });
+    },
+    handleUpload() {
+      window.mplus.openGalleryImg({
+        plus: {
+          multiple: true,
+          success: function(paths) {
+            paths.forEach(item => {
+              window.mplus.uploadFile({
+                plus: {
+                  remoteUrl:
+                    "https://cpspddtest.hzquwei.com/image/uploadImg.do?resType=1",
+                  filePath: item,
+                  success: function(res) {
+                    console.log(res, 135);
+                  }
+                }
+              });
+            });
           }
         }
       });

@@ -85,6 +85,8 @@
   }
 
   var saveImg = function (config) {} // 保存图片
+  var openGalleryImg = function (config) {} // 打开相册
+  var uploadFile = function (config) {} // 上传文件
 
   function _toQueryPair (key, value) {
     if (typeof value === 'undefined') {
@@ -838,6 +840,119 @@
         }
       })
     }
+
+    openGalleryImg = config => {
+      config = config || {}
+      var filter = config.plus.filter || 'image'
+      var multiple = config.plus.multiple || false
+      var success = config.plus.success
+      var error = config.plus.error
+      plus.gallery.pick(
+        function (e) {
+          if (multiple) {
+            success && success(e.files)
+          } else {
+            success && success(e)
+          }
+        },
+        function (e) {
+          error && error(e)
+        },
+        { filter, multiple }
+      )
+    }
+
+    uploadFile = function (config) {
+      config = config || {}
+      var remoteUrl = config.plus.remoteUrl // 接口地址
+      var filePath = config.plus.filePath // 本地路径
+      var name = config.plus.name || 'file'
+      var mimeType = config.plus.mimeType
+      var formData = config.plus.formData || {} // 上传的附加数据
+      var header = config.plus.header || {}
+      var option = config.plus.option || {}
+      var progress = config.plus.progress
+      var success = config.plus.success
+      var error = config.plus.error
+      var prePotions = {
+        method: 'POST',
+        blocksize: 102400,
+        priority: 100,
+        timeout: 120,
+        retry: 3,
+        retryInterval: 30
+      }
+      for (var k in prePotions) {
+        if (prePotions.hasOwnProperty(k)) {
+          option[k] = prePotions[k]
+        }
+      }
+
+      _r(function (plus) {
+        _showLoading()
+        var task = plus.uploader.createUpload(remoteUrl, option, function (
+          t,
+          status
+        ) {
+          // 上传完成
+          if (status == 200) {
+            try {
+              success && success(JSON.parse(t.responseText))
+              _closeLoading()
+            } catch (e) {
+              success && success(t.responseText)
+            }
+          } else {
+            error && error(t)
+          }
+        })
+
+        const addOption = {
+          key: name
+        }
+
+        if (mimeType) addOption['mime'] = mimeType
+
+        var addSuccess = task.addFile(filePath, addOption)
+        if (!addSuccess) {
+          return (
+            error &&
+            error({
+              code: -1,
+              message: '指定的文件路径不合法或文件不存在'
+            })
+          )
+        }
+
+        for (var key in formData) {
+          if (formData.hasOwnProperty(key)) {
+            task.addData(key, formData[key])
+          }
+        }
+
+        for (var key in header) {
+          if (header.hasOwnProperty(key)) {
+            task.setRequestHeader(key, header[key])
+          }
+        }
+
+        task.addEventListener(
+          'statechanged',
+          function () {
+            if (typeof progress == 'function') {
+              var percent = parseFloat(
+                (task.uploadedSize / task.totalSize) * 100
+              ).toFixed(2)
+              progress &&
+                progress(task.uploadedSize, task.totalSize, percent + '%')
+            }
+          },
+          false
+        )
+
+        task.start()
+      })
+    }
   }) // --- _html5PlusEnv e ---
 
   window.mplus = {
@@ -858,6 +973,8 @@
     openMmj: openMmj, // 打开拼多多
 
     openMap: openMap, // 打开地图
-    saveImg: saveImg // 保存图片
+    saveImg: saveImg, // 保存图片
+    openGalleryImg: openGalleryImg, // 打开相册
+    uploadFile: uploadFile // 上传文件
   }
 })()
