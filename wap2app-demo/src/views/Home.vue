@@ -15,6 +15,7 @@
     <button @click="handleOpenMap">打开地图</button><br /><br />
     <button @click="handleSaveImg">保存图片</button><br /><br />
     <button @click="handleUpload">上传文件</button><br /><br />
+    <a href="http://cpsh5.315hm.com/#/incomeReport">打开webview1</a><br /><br />
   </div>
 </template>
 

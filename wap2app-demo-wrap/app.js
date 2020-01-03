@@ -21,7 +21,7 @@ App({
         console.log('hide');
     }
 });
-Page('__W2A__192.168.2.228', { //首页扩展配置
+Page('__W2A__192.168.3.23', { //首页扩展配置
     onShow: function() {
 
     },
